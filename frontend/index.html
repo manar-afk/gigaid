@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Gig-Aid: Pan-India multilingual GenAI grievance assistant for gig and informal workers.">
+  <title>Gig-Aid — Grievance Assistant for Gig Workers</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+  <!-- Skip link for keyboard/screen reader navigation -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="app-header" role="banner">
+    <div class="header-container">
+      <div class="branding">
+        <h1 class="app-title">Gig-Aid</h1>
+        <p class="app-tagline">Grievance Assistant for Gig &amp; Informal Workers</p>
+      </div>
+      <div class="header-controls">
+        <div class="language-selector-wrap">
+          <label for="preferred-lang" class="sr-only">Preferred Language</label>
+          <select id="preferred-lang" class="lang-select" aria-label="Select preferred language">
+            <option value="English">English</option>
+            <option value="Hindi" selected>हिंदी (Hindi)</option>
+            <option value="Hinglish">Hinglish</option>
+            <option value="Tamil">தமிழ் (Tamil)</option>
+            <option value="Telugu">తెలుగు (Telugu)</option>
+            <option value="Kannada">ಕನ್ನಡ (Kannada)</option>
+            <option value="Bengali">বাংলা (Bengali)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Safety & Operational Notice Banner -->
+  <aside class="safety-advisory" role="note" aria-label="Safety Notice">
+    <div class="container notice-content">
+      <span class="notice-icon" aria-hidden="true">&#9888;</span>
+      <p>
+        <strong>Safety First:</strong> For your personal safety, please pull over in a safe location before using this tool. 
+        Do not use this application while riding, driving, or operating machinery.
+      </p>
+    </div>
+  </aside>
+
+  <main id="main-content" class="container app-main" role="main">
+    
+    <!-- Worker Flow Steps Visualizer -->
+    <nav class="flow-stepper" aria-label="Dispute Resolution Steps">
+      <ol class="step-list">
+        <li class="step-item step-active" id="step-nav-1"><span class="step-num">1</span> Describe Issue</li>
+        <li class="step-item" id="step-nav-2"><span class="step-num">2</span> Clarify Facts</li>
+        <li class="step-item" id="step-nav-3"><span class="step-num">3</span> Review &amp; Edit Draft</li>
+        <li class="step-item" id="step-nav-4"><span class="step-num">4</span> Next Steps &amp; Sources</li>
+      </ol>
+    </nav>
+
+    <!-- SECTION 1: Intake Form -->
+    <section class="card intake-card" aria-labelledby="intake-heading">
+      <div class="card-header">
+        <h2 id="intake-heading" class="card-title">Describe Your Dispute</h2>
+        <p class="card-subtitle">
+          Describe what happened with your payout, unfair fine, blocked account, or work issue in your own words.
+        </p>
+      </div>
+
+      <form id="dispute-form" class="dispute-form" novalidate>
+        
+        <!-- Platform & Category Row -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="platform-input">Platform / Employer <span class="text-muted">(Optional)</span></label>
+            <input 
+              type="text" 
+              id="platform-input" 
+              class="form-control" 
+              placeholder="e.g., Zomato, Swiggy, Uber, Ola, Blinkit, Zepto, Construction" 
+              maxlength="100"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="category-select">Dispute Category</label>
+            <select id="category-select" class="form-control">
+              <option value="pay_or_payout">Pay, Payout, or Withheld Wages</option>
+              <option value="penalty_or_fine">Unfair Penalty or Fine Deduction</option>
+              <option value="account_deactivation">Account Deactivation / ID Blocked</option>
+              <option value="accident_or_safety">Accident, Medical, or Road Safety</option>
+              <option value="workplace_or_harassment">Workplace Dispute or Harassment</option>
+              <option value="other">Other Dispute</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- State / Location Selection for Pan-India & State Specific Guidance -->
+        <div class="form-group">
+          <label for="state-input">
+            Your State or Union Territory <span class="text-muted">(Optional, for location-specific rights)</span>
+          </label>
+          <input 
+            type="text" 
+            id="state-input" 
+            class="form-control" 
+            placeholder="e.g., Delhi, Maharashtra, Karnataka, Rajasthan, Uttar Pradesh, Tamil Nadu"
+            maxlength="100"
+          >
+          <small class="helper-text">
+            Central government guidance applies across India. Your state helps us check if specific state acts (e.g., Karnataka 2025 Act, Rajasthan 2023 Act) apply.
+          </small>
+        </div>
+
+        <!-- Main Narrative Input Area with Speech and Text -->
+        <div class="form-group">
+          <div class="label-with-actions">
+            <label for="dispute-narrative">What happened? <span class="required" aria-hidden="true">*</span></label>
+            <!-- Optional Speech Controls -->
+            <div class="speech-controls" id="speech-controls">
+              <button 
+                type="button" 
+                id="voice-record-btn" 
+                class="btn btn-secondary btn-icon" 
+                aria-pressed="false"
+                aria-label="Start voice speech input in selected language"
+              >
+                <span class="mic-icon" aria-hidden="true">&#127908;</span>
+                <span id="voice-record-text">Voice Input (Optional)</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="voice-status-bar" id="voice-status-bar" role="status" aria-live="polite" style="display: none;">
+            <span class="pulsing-dot" aria-hidden="true"></span>
+            <span id="voice-status-text">Listening... Speak in your selected language.</span>
+          </div>
+
+          <textarea 
+            id="dispute-narrative" 
+            class="form-control textarea-narrative" 
+            rows="6" 
+            placeholder="Example: Zomato deducted ₹450 penalty on 14th Oct saying delivery was late. But it was raining heavily and the road was flooded. I completed the delivery safely but they blocked my incentive."
+            required 
+            minlength="10" 
+            maxlength="4000"
+            aria-describedby="narrative-help privacy-help"
+          ></textarea>
+          
+          <div class="input-meta">
+            <small id="narrative-help" class="helper-text">
+              Minimum 10 characters. You may omit any personal ID or phone numbers.
+            </small>
+            <span id="char-count" class="char-count" aria-live="polite">0 / 4000</span>
+          </div>
+        </div>
+
+        <!-- Privacy & AI Disclosure Callout -->
+        <div class="callout privacy-callout" id="privacy-help" role="note">
+          <p>
+            <strong>Privacy &amp; Data Notice:</strong> You can omit personal identifying details (like phone or Aadhaar numbers). 
+            When you create a draft, your text is sent securely to the AI provider to prepare the complaint. 
+            Gig-Aid does not retain your grievance text by default. You stay in control of reviewing and sending the draft.
+          </p>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions">
+          <button type="submit" id="generate-draft-btn" class="btn btn-primary btn-large">
+            <span class="btn-spinner" id="btn-spinner" aria-hidden="true" style="display: none;"></span>
+            <span id="btn-text">Generate Grievance Draft</span>
+          </button>
+        </div>
+
+        <div id="form-error-alert" class="alert alert-danger" role="alert" style="display: none;"></div>
+      </form>
+    </section>
+
+    <!-- SECTION 2: Missing Fact Questions (Rendered if critical details are needed) -->
+    <section id="clarification-section" class="card clarification-card" style="display: none;" aria-labelledby="clarification-heading">
+      <div class="card-header">
+        <h2 id="clarification-heading" class="card-title">Missing Details (Optional to Strengthen Draft)</h2>
+        <p class="card-subtitle">
+          Answering these quick questions makes your draft clearer and harder for the company to dismiss. You may skip any question you prefer not to answer.
+        </p>
+      </div>
+
+      <div id="missing-questions-list" class="questions-container">
+        <!-- Dynamically populated via JS -->
+      </div>
+
+      <div class="card-actions">
+        <button type="button" id="update-draft-with-facts-btn" class="btn btn-primary">
+          Update Grievance Draft
+        </button>
+      </div>
+    </section>
+
+    <!-- SECTION 3: The Grievance Draft & Worker Review Area -->
+    <section id="draft-output-section" class="card draft-card" style="display: none;" aria-labelledby="draft-heading">
+      <div class="card-header draft-header">
+        <div>
+          <h2 id="draft-heading" class="card-title">Your Editable Grievance Draft</h2>
+          <p class="card-subtitle">
+            Review and edit the draft below. The assistant prepares a draft based on your account; it does not claim to have submitted it or guarantee an outcome.
+          </p>
+        </div>
+        <!-- Audio Readout Control -->
+        <div class="audio-readout-wrap">
+          <button 
+            type="button" 
+            id="audio-readout-btn" 
+            class="btn btn-secondary btn-icon" 
+            aria-pressed="false"
+            aria-label="Read worker summary aloud"
+          >
+            <span class="audio-icon" aria-hidden="true">&#128266;</span>
+            <span id="audio-readout-text">Listen Summary</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Plain Language Worker Summary (5th Grade Level) -->
+      <div class="summary-box" aria-label="Simple Plain Language Summary">
+        <h3 class="summary-title">&#128203; Summary in Simple Language</h3>
+        <p id="worker-summary-text" class="summary-text"></p>
+      </div>
+
+      <!-- Editable Subject Line -->
+      <div class="form-group">
+        <label for="draft-subject-input"><strong>Email / Grievance Subject:</strong></label>
+        <input type="text" id="draft-subject-input" class="form-control draft-subject-field">
+      </div>
+
+      <!-- Editable Draft Body -->
+      <div class="form-group">
+        <label for="draft-body-textarea">
+          <strong>Grievance Body:</strong> <span class="text-muted">(You can click inside to edit any word)</span>
+        </label>
+        <textarea id="draft-body-textarea" class="form-control draft-body-field" rows="14"></textarea>
+      </div>
+
+      <!-- Worker Actions: Copy / Download -->
+      <div class="draft-actions-bar">
+        <button type="button" id="copy-draft-btn" class="btn btn-secondary">
+          <span aria-hidden="true">&#128203;</span> Copy Draft to Clipboard
+        </button>
+        <button type="button" id="download-draft-btn" class="btn btn-secondary">
+          <span aria-hidden="true">&#128190;</span> Download Draft (.txt)
+        </button>
+        <span id="copy-status-msg" class="action-status-msg" role="status" aria-live="polite"></span>
+      </div>
+
+      <!-- Breakdown of Facts vs Official Guidance vs Unverified Info -->
+      <div class="verification-breakdown">
+        <h3 class="breakdown-title">Verification Breakdown</h3>
+        <div class="breakdown-grid">
+          
+          <div class="breakdown-col worker-facts-col">
+            <h4><span class="col-icon" aria-hidden="true">&#128100;</span> Worker-Provided Facts</h4>
+            <p class="col-desc">Facts stated by you in your report:</p>
+            <ul id="worker-facts-list" class="fact-list"></ul>
+          </div>
+
+          <div class="breakdown-col verified-guidance-col">
+            <h4><span class="col-icon" aria-hidden="true">&#9989;</span> Verified Official Guidance</h4>
+            <p class="col-desc">Sourced from official Central / State government portals:</p>
+            <ul id="verified-guidance-list" class="fact-list"></ul>
+          </div>
+
+          <div class="breakdown-col unverified-col">
+            <h4><span class="col-icon" aria-hidden="true">&#8505;&#65039;</span> Information Not Verified</h4>
+            <p class="col-desc">Details, deadlines, or claims that could not be independently confirmed:</p>
+            <ul id="unverified-info-list" class="fact-list"></ul>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Worker-Controlled Next Steps -->
+      <div class="next-steps-container">
+        <h3 class="next-steps-title">Worker-Controlled Next Steps</h3>
+        <p class="next-steps-subtitle">
+          You decide if, when, and where to send your grievance. Here are the recommended official paths:
+        </p>
+        <div id="next-steps-list" class="steps-grid">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer class="app-footer" role="contentinfo">
+    <div class="container footer-content">
+      <p>
+        <strong>Gig-Aid</strong> is an open-source, non-profit digital assistance tool for gig &amp; informal workers. 
+        It provides neutral drafting and verified source links. It is not a legal representative and does not guarantee outcome.
+      </p>
+      <p class="footer-links">
+        Official Portals: 
+        <a href="https://eshram.gov.in/" target="_blank" rel="noopener noreferrer">e-Shram</a> &bull;
+        <a href="https://consumerhelpline.gov.in/" target="_blank" rel="noopener noreferrer">National Consumer Helpline (1915)</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
